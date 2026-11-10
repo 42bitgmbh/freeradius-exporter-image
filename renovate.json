@@ -1,0 +1,42 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended",
+        "helpers:pinGitHubActionDigestsToSemver",
+        "customManagers:dockerfileVersions"
+    ],
+    "timezone": "Europe/Vienna",
+    "automerge": false,
+    "labels": [
+        "renovate"
+    ],
+    "packageRules": [
+        {
+            "description": "Upstream exporter release: a merge publishes the image under the new version, then bump the tag in the compose repo (scep-gateway/compose.yaml)",
+            "matchPackageNames": [
+                "bvantagelimited/freeradius_exporter"
+            ],
+            "minimumReleaseAge": "3 days",
+            "prBodyNotes": [
+                "After the merge: the image `ghcr.io/42bitgmbh/freeradius-exporter:<new version>` exists, bump it in `scep-gateway/compose.yaml` of the compose repo."
+            ]
+        },
+        {
+            "description": "Go base image of the build stage: a merge rebuilds and moves the tag of the current exporter version",
+            "matchPackageNames": [
+                "golang"
+            ],
+            "prBodyNotes": [
+                "Build stage only. The merge rebuilds the image and moves the tag of the current exporter version; komodoperi-001 picks it up on its next pull/redeploy."
+            ]
+        },
+        {
+            "description": "GitHub Actions in one PR, releases only after 3 days. The workflow can push packages",
+            "matchManagers": [
+                "github-actions"
+            ],
+            "groupName": "GitHub Actions",
+            "minimumReleaseAge": "3 days"
+        }
+    ]
+}
